@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Parallel uploads to Amazon AWS S3
 #
 # The MIT License (MIT)
@@ -24,12 +24,12 @@
 # SOFTWARE.
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 from fnmatch import fnmatch
 from gzip import GzipFile
-from itertools import chain, imap, islice
+from itertools import chain, islice
 import logging
 from multiprocessing import JoinableQueue, Process, current_process
 from optparse import OptionGroup, OptionParser
@@ -215,7 +215,7 @@ def walk_s3(source, options):
 
 def walker(walk, put_queue, sources, options):
     logger = logging.getLogger('%s[walker-%d]' % (os.path.basename(sys.argv[0]), current_process().pid))
-    pairs = chain(*imap(lambda source: walk(source, options), sources))
+    pairs = chain(*map(lambda source: walk(source, options), sources))
     if options.resume:
         done = set()
         for filename in options.resume:
@@ -275,7 +275,7 @@ def putter(put, put_queue, stat_queue, options):
         # don't bother removing 'guess' from the list since nothing will match it
         gzip_content_types.extend(GZIP_CONTENT_TYPES)
     if options.gzip:
-        logger.debug('These content types will be gzipped: %s' % unicode(gzip_content_types))
+        logger.debug('These content types will be gzipped: %s' % str(gzip_content_types))
     while True:
         args = put_queue.get()
         if args is None:
@@ -482,3 +482,4 @@ def main(argv):
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))
+
